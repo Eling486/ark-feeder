@@ -1,0 +1,13 @@
+version: 1.0.0
+
+### 启动时自动推送最新消息
+### Automatically push the latest message at runtime
+push_latest: false
+
+### 企业微信应用推送
+### Work WeChat app
+workwx:
+  corpid: "Your corpid"
+  agentid: 1000002
+  corpsecret: "Your corpsecret"
+  touser: "@all"

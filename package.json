@@ -1,0 +1,17 @@
+{
+  "name": "ark-feeder",
+  "version": "1.0.0",
+  "description": "A feeder about Arknights News",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Eling486",
+  "license": "MIT",
+  "devDependencies": {
+    "axios": "^0.21.1",
+    "fs": "^0.0.1-security",
+    "request": "^2.88.2",
+    "yamljs": "^0.3.0"
+  }
+}
