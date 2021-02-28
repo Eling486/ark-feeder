@@ -38,13 +38,13 @@ class AnnounceMonitor {
 
     async listen() {
         while (this.listening) {
+            let now = new Date().toLocaleString()
             let latest_announce = await this.getAnnounce()
             if(latest_announce == 'err'){
                 console.error(`${now} - 公告 - 网络错误！`)
                 continue
             }
             let reg_title = new RegExp('\n', 'g')
-            let now = new Date().toLocaleString()
             /*
             this.times++
             if(this.times == 3){
