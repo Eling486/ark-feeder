@@ -80,7 +80,7 @@ class WeiboMonitor {
         let data = {
             "touser": this.touser,
             "msgtype": "news",
-            "agentid": 1000002,
+            "agentid": this.agentid,
             "news": {
                 "articles": [{
                     "title": json.title,

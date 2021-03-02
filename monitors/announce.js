@@ -145,7 +145,7 @@ class AnnounceMonitor {
         let data = {
             "touser": this.touser,
             "msgtype": "textcard",
-            "agentid": 1000002,
+            "agentid": this.agentid,
             "textcard": {
                 "title": "更新预告",
                 "description": "注意注意注意啦~鹰角小姐要更新游戏公告啦！",
@@ -163,7 +163,7 @@ class AnnounceMonitor {
         let data = {
             "touser": this.touser,
             "msgtype": "news",
-            "agentid": 1000002,
+            "agentid": this.agentid,
             "news": {
                 "articles": [{
                     "title": `[公告更新]${json.title}`,
@@ -183,7 +183,7 @@ class AnnounceMonitor {
         let data = {
             "touser": this.touser,
             "msgtype": "image",
-            "agentid": 1000002,
+            "agentid": this.agentid,
             "image": {
                 "media_id": json.media_id
             },
