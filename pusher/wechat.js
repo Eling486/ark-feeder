@@ -46,6 +46,14 @@ class WechatPusher {
             });
     }
 
+    wait(time) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve('fin')
+            }, time)
+        })
+    }
+
     // 上传网络图片资源
     async uploadImgFromUrl(img_url) {
         await this.updateAccessToken()
@@ -56,7 +64,7 @@ class WechatPusher {
 
             let downloadStream = fs.createWriteStream(img_path);
             request(img_url).pipe(downloadStream)
-            downloadStream.on('drain', () => {
+            downloadStream.on('close', () => {
                 downloadStream.end()
                 resolve(this.uploadImg(img_path, true))
             });
