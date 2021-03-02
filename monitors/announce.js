@@ -47,8 +47,8 @@ class AnnounceMonitor {
             let reg_title = new RegExp('\n', 'g')
             /*
             this.times++
-            if(this.times == 3){
-                this.latest_announce.latest_aid = '584'
+            if(this.times == 2){
+                this.latest_announce.latest_aid = '586'
             }
             
             this.times++
@@ -178,7 +178,14 @@ class AnnounceMonitor {
                 .then(res => {
                     let data = res.data
                     let reg_banner = new RegExp('<img class="banner-image" src="(.*?)" />', 'g')
-                    let banner_url = data.match(reg_banner)[0].split('"')[3]
+                    let reg_image = new RegExp('<div class="media-wrap image-wrap"><img src="(.*?)"*/></div>', 'g')
+                    let banner_url = ''
+                    if(reg_image.test(data)){
+                        banner_url = data.match(reg_image)[0].split('"')[3]
+                    }
+                    if(reg_banner.test(data)){
+                        banner_url = data.match(reg_banner)[0].split('"')[3]
+                    }
                     resolve(banner_url)
                 })
         })
