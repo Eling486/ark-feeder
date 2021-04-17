@@ -98,18 +98,22 @@ class WeiboMonitor {
 
     getLatestMid() {
         return new Promise(resolve => {
-            axios
-                .get(this.weibo_url)
-                .then(res => {
-                    let cards = res.data.data.cards
-                    let latest_mid = 0
-                    for (let i = 0; i < cards.length; i++) {
-                        if (cards[i].mblog.mid > latest_mid) {
-                            latest_mid = cards[i].mblog.mid
-                        }
+            axios.request({
+                url: this.weibo_url,
+                method: 'GET',
+                headers: {
+                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
+                }
+            }).then(res => {
+                let cards = res.data.data.cards
+                let latest_mid = 0
+                for (let i = 0; i < cards.length; i++) {
+                    if (cards[i].mblog.mid > latest_mid) {
+                        latest_mid = cards[i].mblog.mid
                     }
-                    resolve(latest_mid)
-                })
+                }
+                resolve(latest_mid)
+            })
                 .catch(err => {
                     console.log(err);
                     resolve('err')
@@ -173,24 +177,24 @@ class WeiboMonitor {
                     text = text.replace(reg_br, '\\n')
 
                     let title
-                    if(reg_title.test(content)){
+                    if (reg_title.test(content)) {
                         title = content.match(reg_title)[0]
-                        if(reg_a.test(title)){
+                        if (reg_a.test(title)) {
                             title = title.split('#')[1]
-                        }else{
+                        } else {
                             title = title.replace(reg_a_2, '')
                             title = title.replace(reg_br, '')
                         }
-                    }else{
+                    } else {
                         title = '官方微博更新'
                     }
-                    
+
                     let json = JSON.parse(`{
                         "title": "${title}",
                         "url": "${url}",
                         "pic_url": ${pic_url},
                         ${text}}`)
-                        
+
                     resolve(json)
                 })
                 .catch(err => {

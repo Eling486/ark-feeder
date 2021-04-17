@@ -8,6 +8,7 @@ class AnnounceMonitor {
         this.announce_url = 'https://ak-fs.hypergryph.com/announce/IOS/announcement.meta.json'
         this.wechat_pusher = new WechatPusher(param)
         this.touser = param.touser
+        this.pushed_id = []
         this.listening = true
         this.times = 0 // 调试用
         this.init()
@@ -33,6 +34,10 @@ class AnnounceMonitor {
                 }
             }
         }
+        for (let i in this.latest_announce.announce_list) {
+            this.pushed_id.push(this.latest_announce.announce_list[i].announceId)
+        }
+        console.log(this.pushed_id)
         this.listen()
     }
 
@@ -64,22 +69,9 @@ class AnnounceMonitor {
                 let push_list = []
                 for (let i = 0; i < latest_announce.announce_list.length; i++) {
                     if (parseInt(latest_announce.announce_list[i].announceId) >= this.latest_announce.latest_aid) {
-                        if (latest_announce.announce_list[i].group == "SYSTEM") {
-                            let content_url = `https://ak-fs.hypergryph.com/announce/IOS/announcement/${latest_announce.announce_list[i].announceId}.html`
-                            let title = latest_announce.announce_list[i].title
-                            let img_url = await this.getBannerImg(content_url)
-                            let json = {
-                                "title": title.replace(reg_title, ' '),
-                                "description": title.replace(reg_title, '\n'),
-                                "url": content_url,
-                                "pic_url": img_url
-                            }
-                            push_list.push(json)
-                        }
-                        if (latest_announce.announce_list[i].group == "ACTIVITY") {
-                            let content_url = `https://ak-fs.hypergryph.com/announce/IOS/announcement/${latest_announce.announce_list[i].announceId}.html`
-                            let announce_type = await this.getAnnounceType(content_url)
-                            if (announce_type == 'article') {
+                        if (this.pushed_id.indexOf(latest_announce.announce_list[i].announceId) < 0) {
+                            if (latest_announce.announce_list[i].group == "SYSTEM") {
+                                let content_url = `https://ak-fs.hypergryph.com/announce/IOS/announcement/${latest_announce.announce_list[i].announceId}.html`
                                 let title = latest_announce.announce_list[i].title
                                 let img_url = await this.getBannerImg(content_url)
                                 let json = {
@@ -89,19 +81,35 @@ class AnnounceMonitor {
                                     "pic_url": img_url
                                 }
                                 push_list.push(json)
-                                continue;
                             }
-                            if (announce_type == 'image') {
+                            if (latest_announce.announce_list[i].group == "ACTIVITY") {
                                 let content_url = `https://ak-fs.hypergryph.com/announce/IOS/announcement/${latest_announce.announce_list[i].announceId}.html`
-                                let img_url = await this.getBannerImg(content_url)
-                                let media_info = await this.wechat_pusher.uploadImgFromUrl(img_url)
-                                let media_id = media_info.media_id
-                                let json = {
-                                    "media_id": media_id
+                                let announce_type = await this.getAnnounceType(content_url)
+                                if (announce_type == 'article') {
+                                    let title = latest_announce.announce_list[i].title
+                                    let img_url = await this.getBannerImg(content_url)
+                                    let json = {
+                                        "title": title.replace(reg_title, ' '),
+                                        "description": title.replace(reg_title, '\n'),
+                                        "url": content_url,
+                                        "pic_url": img_url
+                                    }
+                                    push_list.push(json)
+                                    continue;
                                 }
-                                this.pushImg(json)
-                                continue;
+                                if (announce_type == 'image') {
+                                    let content_url = `https://ak-fs.hypergryph.com/announce/IOS/announcement/${latest_announce.announce_list[i].announceId}.html`
+                                    let img_url = await this.getBannerImg(content_url)
+                                    let media_info = await this.wechat_pusher.uploadImgFromUrl(img_url)
+                                    let media_id = media_info.media_id
+                                    let json = {
+                                        "media_id": media_id
+                                    }
+                                    this.pushImg(json)
+                                    continue;
+                                }
                             }
+                            this.pushed_id.push(latest_announce.announce_list[i].announceId)
                         }
                     }
                 }
@@ -226,8 +234,9 @@ class AnnounceMonitor {
                 .then(res => {
                     let data = res.data
                     let reg_cover = new RegExp('cover-jumper', 'g')
+                    let reg_cover2 = new RegExp('banner-image-container cover', 'g')
                     let announce_type = 'article'
-                    if (reg_cover.test(data)) {
+                    if (reg_cover.test(data) || reg_cover2.test(data)) {
                         announce_type = 'image'
                     }
                     resolve(announce_type)
